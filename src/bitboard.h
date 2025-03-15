@@ -13,13 +13,13 @@ typedef uint64_t Bitboard;
 #define BB_POP_LSB(x, b)                                                       \
     do {                                                                       \
         b = BB_LSB(x);                                                         \
-        x &= ~(1ULL << b);                                                        \
+        x &= ~(1ULL << b);                                                     \
     } while (0)
 
 #define BB_POP_MSB(x, b)                                                       \
     do {                                                                       \
         b = BB_MSB(x);                                                         \
-        x &= ~(1ULL << b);                                                        \
+        x &= ~(1ULL << b);                                                     \
     } while (0)
 
 void bitboardPrint(Bitboard x);
@@ -27,8 +27,6 @@ void bitboardPrint(Bitboard x);
 extern const Bitboard pawn_attacks[BOARDSQUARE_N * 2];
 extern const Bitboard knight_attacks[BOARDSQUARE_N];
 extern const Bitboard king_attacks[BOARDSQUARE_N];
-extern const Bitboard rook_rays[BOARDSQUARE_N];
-extern const Bitboard bishop_rays[BOARDSQUARE_N];
 
 typedef struct SMagic {
     Bitboard mask;

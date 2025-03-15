@@ -4,6 +4,6 @@
 
 int main(void){
     initSlidingPiecesTables();
-    bitboardPrint(getRookAttacks(C3, 0xFFFFFF000000FF00));
+    bitboardPrint(getBishopAttacks(C3, 0xFFFFFF000000FF00));
     return 0;
 }
