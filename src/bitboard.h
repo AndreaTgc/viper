@@ -66,7 +66,7 @@ Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks);
 
 FORCE_INLINE Bitboard getPawnAttacks(BoardSquare sq, Color c);
 FORCE_INLINE Bitboard getKnightAttacks(BoardSquare sq);
-FORCE_INLINE Bitboard getKingAttacs(BoardSquare sq);
+FORCE_INLINE Bitboard getKingAttacks(BoardSquare sq);
 FORCE_INLINE Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks);
 FORCE_INLINE Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks);
 FORCE_INLINE Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks);
