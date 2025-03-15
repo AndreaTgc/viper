@@ -1,7 +1,6 @@
 #include "bitboard.h"
 #include "engine_types.h"
 #include <stdio.h>
-#include <wchar.h>
 
 void bitboardPrint(Bitboard x) {
     for (int i = 7; i >= 0; i--) {
@@ -13,6 +12,90 @@ void bitboardPrint(Bitboard x) {
     }
     putchar('\n');
 }
+
+void initSlidingPiecesTables(void) {
+    for (BoardSquare sq = A1; sq <= H8; sq++) {
+        printf("initializing square %d\n", sq);
+        int bits = BOARDSQUARE_N - rook_magics[sq].shift;
+        for (int i = 0; i < (1ULL << bits); i++) {
+            // Generate all the possible blocks configurations
+            Bitboard blk = generateBlocks(i, bits, rook_magics[sq].mask);
+            Bitboard hash =
+                ((blk & rook_magics[sq].mask) * rook_magics[sq].magic) >>
+                rook_magics[sq].shift;
+            rook_attacks[hash + rook_magics[sq].offset] =
+                generateRookAttack(sq, blk);
+        }
+    }
+}
+
+Bitboard generateBlocks(int idx, int n, Bitboard mask) {
+    Bitboard blk = 0ULL;
+    BoardSquare lsb;
+    for (int i = 0; i < n; i++) {
+        BB_POP_LSB(mask, lsb);
+        if (idx & (1 << i))
+            blk |= SQUARE_AS_BIT(lsb);
+    }
+    return blk;
+}
+
+Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks) {
+    Bitboard attacks = 0;
+    int rank = sq / 8, file = sq % 8;
+    for (int r = rank + 1; r < 8; r++) {
+        attacks |= (1ULL << (r * 8 + file));
+        if (blocks & (1ULL << (r * 8 + file)))
+            break;
+    }
+    for (int r = rank - 1; r >= 0; r--) {
+        attacks |= (1ULL << (r * 8 + file));
+        if (blocks & (1ULL << (r * 8 + file)))
+            break;
+    }
+    for (int f = file + 1; f < 8; f++) {
+        attacks |= (1ULL << (rank * 8 + f));
+        if (blocks & (1ULL << (rank * 8 + f)))
+            break;
+    }
+    for (int f = file - 1; f >= 0; f--) {
+        attacks |= (1ULL << (rank * 8 + f));
+        if (blocks & (1ULL << (rank * 8 + f)))
+            break;
+    }
+    return attacks;
+}
+
+Bitboard getPawnAttacks(BoardSquare sq, Color c) {
+    return pawn_attacks[sq + (64 * c)];
+}
+
+Bitboard getKnightAttacks(BoardSquare sq) {
+    return knight_attacks[sq];
+}
+
+Bitboard getKingAttacks(BoardSquare sq) {
+    return king_attacks[sq];
+}
+
+Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks) {
+    Bitboard hash = blocks & rook_magics[sq].mask;
+    hash = (hash * rook_magics[sq].magic) >> rook_magics[sq].shift;
+    return rook_attacks[hash + rook_magics[sq].offset];
+}
+
+Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks) {
+    Bitboard hash = blocks & bishop_magics[sq].mask;
+    hash = (hash * bishop_magics[sq].magic) >> bishop_magics[sq].shift;
+    return bishop_attacks[hash + bishop_magics[sq].offset];
+}
+
+Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks) {
+    return getBishopAttacks(sq, blocks) | getRookAttacks(sq, blocks);
+}
+
+Bitboard rook_attacks[102400];
+Bitboard bishop_attacks[5248];
 
 const Bitboard pawn_attacks[BOARDSQUARE_N * 2] = {
     0x0000000000000200, 0x0000000000000500, 0x0000000000000a00,

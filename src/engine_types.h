@@ -15,6 +15,8 @@ typedef enum EBoardSquare {
   // clang-format on
 } BoardSquare;
 
+#define SQUARE_AS_BIT(sq) (1ULL << (sq))
+
 #define SQUARE_IS_VALID(x) (x >= A1 && x <= H8)
 
 typedef enum EPieceType {
