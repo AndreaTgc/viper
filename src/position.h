@@ -14,6 +14,10 @@ typedef struct SPosition {
     uint8_t half_move_clock;
 } Position;
 
+/// Pretty prints the current position on stdout
 void positionPrint(Position* pos);
+
+/// Sets up the initial position (can act as reset)
+void positionSetInitial(Position* pos);
 
 #endif // guard_position_h

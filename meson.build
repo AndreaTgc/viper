@@ -13,6 +13,6 @@ endif
 # Define the executable
 executable(
   'viper',
-  sources: ['src/viper.c', 'src/bitboard.c', 'src/position.c'],
+  sources: ['src/viper.c', 'src/bitboard.c', 'src/position.c', 'src/movegen.c'],
   include_directories: inc_dir,
 )
