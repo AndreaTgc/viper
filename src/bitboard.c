@@ -1,5 +1,6 @@
 #include "bitboard.h"
 #include "engine_types.h"
+#include "utils.h"
 #include <stdio.h>
 
 void bitboardPrint(Bitboard x) {
@@ -36,7 +37,7 @@ void initSlidingPiecesTables(void) {
     }
 }
 
-Bitboard generateBlocks(int idx, int n, Bitboard mask) {
+static inline Bitboard generateBlocks(int idx, int n, Bitboard mask) {
     Bitboard blk = 0ULL;
     BoardSquare lsb;
     for (int i = 0; i < n; i++) {
@@ -47,7 +48,7 @@ Bitboard generateBlocks(int idx, int n, Bitboard mask) {
     return blk;
 }
 
-Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks) {
+static inline Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks) {
     Bitboard attacks = 0;
     int rank = sq / 8, file = sq % 8;
     for (int r = rank + 1; r < 8; r++) {
@@ -73,7 +74,7 @@ Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks) {
     return attacks;
 }
 
-Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks) {
+static inline Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks) {
     Bitboard attacks = 0;
     int rank = sq / 8, file = sq % 8;
     for (int r = rank + 1, f = file + 1; r < 8 && f < 8; r++, f++) {
@@ -99,31 +100,19 @@ Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks) {
     return attacks;
 }
 
-Bitboard getPawnAttacks(BoardSquare sq, Color c) {
-    return pawn_attacks[sq + (64 * c)];
-}
-
-Bitboard getKnightAttacks(BoardSquare sq) {
-    return knight_attacks[sq];
-}
-
-Bitboard getKingAttacks(BoardSquare sq) {
-    return king_attacks[sq];
-}
-
-Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks) {
+FORCE_INLINE Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks) {
     Bitboard hash = blocks & rook_magics[sq].mask;
     hash = (hash * rook_magics[sq].magic) >> rook_magics[sq].shift;
     return rook_attacks[hash + rook_magics[sq].offset];
 }
 
-Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks) {
+FORCE_INLINE Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks) {
     Bitboard hash = blocks & bishop_magics[sq].mask;
     hash = (hash * bishop_magics[sq].magic) >> bishop_magics[sq].shift;
     return bishop_attacks[hash + bishop_magics[sq].offset];
 }
 
-Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks) {
+FORCE_INLINE Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks) {
     return getBishopAttacks(sq, blocks) | getRookAttacks(sq, blocks);
 }
 

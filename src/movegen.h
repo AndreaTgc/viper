@@ -2,19 +2,15 @@
 #define guard_movegen_h
 
 #include "bitboard.h"
-#include "position.h"
 #include "engine_types.h"
-#include "util.h"
 #include "move.h"
+#include "position.h"
+#include "util.h"
 #include "utils.h"
 
-void genPseudoLegalMoves(Position* pos, Move* move_list);
-
-FORCE_INLINE void genPawnMoves(Position* pos, Move* move_list);
-FORCE_INLINE void genKnightMoves(Position* pos, Move* move_list);
-FORCE_INLINE void genBishopMoves(Position* pos, Move* move_list);
-FORCE_INLINE void genRookMoves(Position* pos, Move* move_list);
-FORCE_INLINE void genQueenMoves(Position* pos, Move* move_list);
-FORCE_INLINE void genKingMoves(Position* pos, Move* move_list);
+/// Function that takes a given position and generates all the
+/// pseudo-legal moves possible for the player who has to make a move
+/// and adds them in the MoveList passed as parameter
+void genPseudoLegalMoves(Position *pos, MoveList *moves);
 
 #endif // guard_movegen_h

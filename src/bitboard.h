@@ -60,13 +60,10 @@ extern const Magic bishop_magics[BOARDSQUARE_N];
 extern Bitboard rook_attacks[102400];
 extern Bitboard bishop_attacks[5248];
 
-Bitboard generateBlocks(int idx, int n, Bitboard mask);
-Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks);
-Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks);
+static inline Bitboard generateBlocks(int idx, int n, Bitboard mask);
+static inline Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks);
+static inline Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks);
 
-FORCE_INLINE Bitboard getPawnAttacks(BoardSquare sq, Color c);
-FORCE_INLINE Bitboard getKnightAttacks(BoardSquare sq);
-FORCE_INLINE Bitboard getKingAttacks(BoardSquare sq);
 FORCE_INLINE Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks);
 FORCE_INLINE Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks);
 FORCE_INLINE Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks);

@@ -15,15 +15,20 @@
 /// Bits 14-15: Move type encoding (Promotion/EnPassant/Castling)
 typedef uint16_t Move;
 
+typedef struct SMoveList {
+    Move moves[256];
+    int size;
+} MoveList;
+
 typedef enum EMoveType {
-    NORMAL = 0,
+    QUIET = 0,
     PROMOTION,
     CAPTURE,
     EN_PASSANT,
 } MoveType;
 
 #define MOVE_ENCODE(from, to, flag, type)                                      \
-    (Move)(((from)&0x3F) | (((to)&0x3F) << 6) | (((promotion)&0x03) << 12) |   \
+    (Move)(((from)&0x3F) | (((to)&0x3F) << 6) | (((flag)&0x03) << 12) |        \
            (((type)&0x03) << 14))
 
 #define MOVE_GET_FROM(m) ((m)&0x3F)
@@ -58,7 +63,5 @@ Move moveFromString(const char *str);
 
 /// Returns the fen notation of the move
 const char *moveToString(Move m);
-
-
 
 #endif // guard_move_h
