@@ -34,7 +34,7 @@ typedef enum EMoveType {
 #define MOVE_GET_FROM(m) ((m)&0x3F)
 #define MOVE_GET_TO(m)   (((m) >> 6) & 0x3F)
 #define MOVE_GET_FLAG(m) (((m) >> 12) & 0x03)
-#define MOVE_GET_TYPE(m) ((m) >> 14) & 0x03);
+#define MOVE_GET_TYPE(m) (((m) >> 14) & 0x03)
 
 /// Clears the 'from' bits and sets the new value
 #define MOVE_SET_FROM(m, from)                                                 \
@@ -62,6 +62,6 @@ typedef enum EMoveType {
 Move moveFromString(const char *str);
 
 /// Returns the fen notation of the move
-const char *moveToString(Move m);
+void moveToString(Move m, char* buf);
 
 #endif // guard_move_h

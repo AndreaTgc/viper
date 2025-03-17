@@ -160,3 +160,5 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves) {
         }
     }
 }
+
+void filterNonLegalMoves(Position *pos, MoveList *list) {}

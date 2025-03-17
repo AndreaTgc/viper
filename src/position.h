@@ -20,4 +20,11 @@ void positionPrint(Position* pos);
 /// Sets up the initial position (can act as reset)
 void positionSetInitial(Position* pos);
 
+/// Loads a position encoded in a fen string
+void positionFromFen(Position* pos, char* fen);
+
+/// Applies a move to the current state of the position
+/// TODO: add a way to track moves for undos
+void positionApplyMove(Position* pos, Move move);
+
 #endif // guard_position_h

@@ -13,4 +13,9 @@
 /// and adds them in the MoveList passed as parameter
 void genPseudoLegalMoves(Position *pos, MoveList *moves);
 
+/// Takes as input a position and a list of pseudo-legal moves and filters
+/// out the ones that are not legal (e.g. moves that lead to the player's own
+/// king being in check)
+void filterNonLegalMoves(Position *pos, MoveList *list);
+
 #endif // guard_movegen_h

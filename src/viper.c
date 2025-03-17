@@ -14,4 +14,9 @@ int main(void){
     positionPrint(&pos);
     genPseudoLegalMoves(&pos, &list);
     printf("pseudo legal moves = %d\n", list.size);
+    for(int i = 0; i < list.size; i++){
+        char buf[6];
+        moveToString(list.moves[i], buf);
+        printf("Move at index %d = %s\n", i, buf);
+    }
 }

@@ -1,5 +1,6 @@
 #include "position.h"
 #include "engine_types.h"
+#include "move.h"
 #include <stdio.h>
 
 void positionPrint(Position *pos) {
