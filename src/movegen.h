@@ -18,4 +18,11 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves);
 /// king being in check)
 void filterNonLegalMoves(Position *pos, MoveList *list);
 
+/// Generates a bitboard that contains all the squares that can be attacked
+/// By a player
+/// NOTE: This mask is generated without taking into account the fact that some
+/// moves may not be valid since an ally piece is blocking that square
+/// (Expect for sliding pieces, they have to take it into account anyway)
+Bitboard genFullAttacksMask(Position* pos, Color player);
+
 #endif // guard_movegen_h

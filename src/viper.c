@@ -12,11 +12,7 @@ int main(void){
     };
     positionSetInitial(&pos);
     positionPrint(&pos);
-    genPseudoLegalMoves(&pos, &list);
-    printf("pseudo legal moves = %d\n", list.size);
-    for(int i = 0; i < list.size; i++){
-        char buf[6];
-        moveToString(list.moves[i], buf);
-        printf("Move at index %d = %s\n", i, buf);
-    }
+    bitboardPrint(pos.occupancies[WHITE]);
+    printf("[MASK OF THE SQUARES ATTACKED BY WHITE]");
+    bitboardPrint(genFullAttacksMask(&pos, pos.player_to_move));
 }
