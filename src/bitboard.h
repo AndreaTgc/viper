@@ -2,7 +2,6 @@
 #define guard_bitboard_h
 
 #include "engine_types.h"
-#include "utils.h"
 #include <stdint.h>
 
 typedef uint64_t Bitboard;
@@ -40,7 +39,7 @@ typedef uint64_t Bitboard;
         x &= ~(1ULL << b);                                                     \
     } while (0)
 
-void bitboardPrint(Bitboard x);
+void bitboard_print(Bitboard x);
 
 extern const Bitboard pawn_attacks[BOARDSQUARE_N * 2];
 extern const Bitboard knight_attacks[BOARDSQUARE_N];
@@ -53,19 +52,19 @@ typedef struct SMagic {
     int offset;
 } Magic;
 
-void initSlidingPiecesTables(void);
+void init_magic_bitboards(void);
 
 extern const Magic rook_magics[BOARDSQUARE_N];
 extern const Magic bishop_magics[BOARDSQUARE_N];
 extern Bitboard rook_attacks[102400];
 extern Bitboard bishop_attacks[5248];
 
-static inline Bitboard generateBlocks(int idx, int n, Bitboard mask);
-static inline Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks);
-static inline Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks);
+static inline Bitboard _generate_blocks(int idx, int n, Bitboard mask);
+static inline Bitboard _generate_rook_attacks(BoardSquare sq, Bitboard blocks);
+static inline Bitboard _generate_bishop_attacks(BoardSquare sq, Bitboard blocks);
 
-FORCE_INLINE Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks);
-FORCE_INLINE Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks);
-FORCE_INLINE Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks);
+Bitboard get_rook_attacks(BoardSquare sq, Bitboard blocks);
+Bitboard get_bishop_attacks(BoardSquare sq, Bitboard blocks);
+Bitboard get_queen_attacks(BoardSquare sq, Bitboard blocks);
 
 #endif // guard_bitboard_h

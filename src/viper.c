@@ -6,13 +6,12 @@
 
 int main(void){
     Position pos = { 0 };
-    MoveList list = {
-        .moves = { 0 },
-        .size = 0,
-    };
-    positionSetInitial(&pos);
-    positionPrint(&pos);
-    bitboardPrint(pos.occupancies[WHITE]);
-    printf("[MASK OF THE SQUARES ATTACKED BY WHITE]");
-    bitboardPrint(genFullAttacksMask(&pos, pos.player_to_move));
+    MoveList list = { 0 };
+    position_set_initial(&pos);
+    generate_pseudo_legal_moves(&pos, &list);
+    for(int i = 0; i < list.size; i++){
+        char buf[10];
+        move_to_string(list.moves[i], buf);
+        printf("%s\n", buf);
+    }
 }

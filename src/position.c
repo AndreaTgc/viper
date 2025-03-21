@@ -1,9 +1,12 @@
 #include "position.h"
 #include "engine_types.h"
 #include "move.h"
+#include <ctype.h>
 #include <stdio.h>
 
-void positionPrint(Position *pos) {
+#define CTOI(c) (int)(c - '0')
+
+void position_print(Position *pos) {
     puts("[POSITION PRETTY PRINTING]");
     printf("[TOTAL MOVES] %d\n", pos->ply);
     printf("[HALF CLOCK MOVES] %d\n", pos->half_move_clock);
@@ -27,7 +30,7 @@ void positionPrint(Position *pos) {
     }
 }
 
-void positionSetInitial(Position *pos) {
+void position_set_initial(Position *pos) {
     pos->ply = 0;
     pos->half_move_clock = 0;
     pos->player_to_move = WHITE;
@@ -46,10 +49,32 @@ void positionSetInitial(Position *pos) {
     pos->pieces[11] = 0ULL | SQUARE_AS_BIT(E8);
     pos->occupancies[WHITE] = 0ULL;
     pos->occupancies[BLACK] = 0ULL;
-    for (int i = 0; i < 6; i++) {
-        pos->occupancies[WHITE] |= pos->pieces[i];
+    POS_RECOMPUTE_OCCUPANCIES(pos);
+}
+
+void position_from_fen(Position *pos, char *fen) {
+    assert(pos != NULL && fen != NULL);
+    char *c = fen;
+    int file = 0, rank = 7;
+    // Loops that set the initial state of the bitboards
+    for (; *c; c++) {
+        if (*c == ' ') {
+            break;
+        } else if (*c == '/') {
+            rank--;
+            file = 0;
+        } else if (isdigit(*c)) {
+            file += CTOI(*c);
+        } else {
+            const char *pc = "PRNBQKprnbqk";
+            for (int i = 0; i < 12; i++) {
+                if (*c == pc[i]) {
+                    pos->pieces[i] |= SQUARE_AS_BIT(rank * 8 + file);
+                    file++;
+                    break;
+                }
+            }
+        }
     }
-    for (int i = 6; i < 12; i++) {
-        pos->occupancies[BLACK] |= pos->pieces[i];
-    }
+    POS_RECOMPUTE_OCCUPANCIES(pos);
 }

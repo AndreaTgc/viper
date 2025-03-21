@@ -35,13 +35,6 @@ typedef enum EColor {
     COLOR_N,
 } Color;
 
-typedef enum EPromotionFlag {
-    PROMO_KNIGHT = 0,
-    PROMO_ROOK,
-    PROMO_BISHOP,
-    PROMO_QUEEN,
-} PromotionFlag;
-
 #define OPPONENT(c) ((c) == WHITE ? BLACK : WHITE)
 
 #endif // guard_engine_types_h

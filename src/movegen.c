@@ -1,9 +1,10 @@
 #include "movegen.h"
 #include "bitboard.h"
 #include "engine_types.h"
+#include "move.h"
 #include <string.h>
 
-void genPseudoLegalMoves(Position *pos, MoveList *moves) {
+void generate_pseudo_legal_moves(Position *pos, MoveList *moves) {
     int base = 6 * pos->player_to_move; // 0 if white, 6 if black;
     int starting_square, ending_square; // Temporary variables
     // Constants used to have cleaner code below
@@ -30,16 +31,16 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves) {
             if (SQUARE_AS_BIT(ending_square) & promotion_rank) {
                 // Add all the possible promotions to the move list
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_KNIGHT, CAPTURE);
+                    starting_square, ending_square, MOVE_QUEEN_PROMO_CAP);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_BISHOP, CAPTURE);
+                    starting_square, ending_square, MOVE_KNIGHT_PROMO_CAP);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_QUEEN, CAPTURE);
+                    starting_square, ending_square, MOVE_ROOK_PROMO_CAP);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_ROOK, CAPTURE);
+                    starting_square, ending_square, MOVE_BISHOP_PROMO_CAP);
             } else
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_CAPTURE);
         }
         // Handle pawn pushing
         if (SQUARE_AS_BIT(starting_square) & starting_rank) {
@@ -51,16 +52,16 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves) {
             if (dpush & promotion_rank) {
                 // Add all the possible promotions to the move list
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_KNIGHT, CAPTURE);
+                    starting_square, ending_square, MOVE_QUEEN_PROMO);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_BISHOP, CAPTURE);
+                    starting_square, ending_square, MOVE_KNIGHT_PROMO);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_QUEEN, CAPTURE);
+                    starting_square, ending_square, MOVE_ROOK_PROMO);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_ROOK, CAPTURE);
+                    starting_square, ending_square, MOVE_BISHOP_PROMO);
             } else if (dpush) {
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_QUIET);
             }
         }
         ending_square = starting_square + single_push_offset;
@@ -69,31 +70,31 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves) {
             if (spush & promotion_rank) {
                 // Add all the possible promotions to the move list
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_KNIGHT, CAPTURE);
+                    starting_square, ending_square, MOVE_QUEEN_PROMO);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_BISHOP, CAPTURE);
+                    starting_square, ending_square, MOVE_KNIGHT_PROMO);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_QUEEN, CAPTURE);
+                    starting_square, ending_square, MOVE_ROOK_PROMO);
                 moves->moves[moves->size++] = MOVE_ENCODE(
-                    starting_square, ending_square, PROMO_ROOK, CAPTURE);
+                    starting_square, ending_square, MOVE_BISHOP_PROMO);
             } else if (spush) {
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_QUIET);
             }
         }
     }
     Bitboard rooks = pos->pieces[base + 1];
     while (rooks) {
         BB_POP_LSB(rooks, starting_square);
-        Bitboard attacks = getRookAttacks(starting_square, all_pcs) & ~allies;
+        Bitboard attacks = get_rook_attacks(starting_square, all_pcs) & ~allies;
         while (attacks) {
             BB_POP_LSB(attacks, ending_square);
             if (SQUARE_AS_BIT(ending_square) & enemies)
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_rank, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_rank, ending_square, MOVE_CAPTURE);
             else
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_rank, ending_square, 0, QUIET);
+                    MOVE_ENCODE(starting_rank, ending_square, MOVE_QUIET);
         }
     }
     Bitboard knights = pos->pieces[base + 2];
@@ -104,38 +105,40 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves) {
             BB_POP_LSB(attacks, ending_square);
             if (SQUARE_AS_BIT(ending_square) & enemies)
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_CAPTURE);
             else
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, QUIET);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_QUIET);
         }
     }
     Bitboard bishops = pos->pieces[base + 3];
     while (bishops) {
         BB_POP_LSB(bishops, starting_square);
-        Bitboard attacks = getBishopAttacks(starting_square, all_pcs) & ~allies;
+        Bitboard attacks =
+            get_bishop_attacks(starting_square, all_pcs) & ~allies;
         while (attacks) {
             BB_POP_LSB(attacks, ending_square);
             if (SQUARE_AS_BIT(ending_square) & enemies)
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_rank, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_rank, ending_square, MOVE_CAPTURE);
             else
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_rank, ending_square, 0, QUIET);
+                    MOVE_ENCODE(starting_rank, ending_square, MOVE_QUIET);
         }
     }
     Bitboard queens = pos->pieces[base + 4];
     while (queens) {
         BB_POP_LSB(queens, starting_square);
-        Bitboard attacks = getQueenAttacks(starting_square, all_pcs) & ~allies;
+        Bitboard attacks =
+            get_queen_attacks(starting_square, all_pcs) & ~allies;
         while (attacks) {
             BB_POP_LSB(attacks, ending_square);
             if (SQUARE_AS_BIT(ending_square) & enemies)
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_rank, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_rank, ending_square, MOVE_CAPTURE);
             else
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_rank, ending_square, 0, QUIET);
+                    MOVE_ENCODE(starting_rank, ending_square, MOVE_QUIET);
         }
     }
     Bitboard king = pos->pieces[base + 5];
@@ -148,15 +151,15 @@ void genPseudoLegalMoves(Position *pos, MoveList *moves) {
             if (SQUARE_AS_BIT(ending_square) &
                 pos->occupancies[OPPONENT(pos->player_to_move)])
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, CAPTURE);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_CAPTURE);
             else
                 moves->moves[moves->size++] =
-                    MOVE_ENCODE(starting_square, ending_square, 0, QUIET);
+                    MOVE_ENCODE(starting_square, ending_square, MOVE_QUIET);
         }
     }
 }
 
-void filterNonLegalMoves(Position *pos, MoveList *list) {
+void filter_non_legal_moves(Position *pos, MoveList *list) {
     MoveList temp_list = {
         .size = 0,
         .moves = {0},
@@ -165,7 +168,7 @@ void filterNonLegalMoves(Position *pos, MoveList *list) {
     const Color oppo = OPPONENT(pos->player_to_move);
     for (int i = 0; i < list->size; i++) {
         // TODO: Apply move
-        if (current_king & ~genFullAttacksMask(pos, oppo)) {
+        if (current_king & ~generate_full_attacks_mask(pos, oppo)) {
             // The move is legal, we can add it to the list
             temp_list.moves[temp_list.size++] = list->moves[i];
         }
@@ -174,7 +177,7 @@ void filterNonLegalMoves(Position *pos, MoveList *list) {
     memcpy(list->moves, temp_list.moves, sizeof(Move) * temp_list.size);
 }
 
-Bitboard genFullAttacksMask(Position *pos, Color player) {
+Bitboard generate_full_attacks_mask(Position *pos, Color player) {
     const int player_offset = player * 6;
     const Bitboard all_pcs = pos->occupancies[WHITE] | pos->occupancies[BLACK];
     int starting_square;
@@ -189,7 +192,7 @@ Bitboard genFullAttacksMask(Position *pos, Color player) {
     piece = pos->pieces[1 + player_offset];
     while (piece) {
         BB_POP_LSB(piece, starting_square);
-        attack_mask |= getRookAttacks(starting_square, all_pcs);
+        attack_mask |= get_rook_attacks(starting_square, all_pcs);
     }
     // Get knight attacks
     piece = pos->pieces[2 + player_offset];
@@ -201,13 +204,13 @@ Bitboard genFullAttacksMask(Position *pos, Color player) {
     piece = pos->pieces[3 + player_offset];
     while (piece) {
         BB_POP_LSB(piece, starting_square);
-        attack_mask |= getBishopAttacks(starting_square, all_pcs);
+        attack_mask |= get_bishop_attacks(starting_square, all_pcs);
     }
     // Get queen attacks
     piece = pos->pieces[4 + player_offset];
     while (piece) {
         BB_POP_LSB(piece, starting_square);
-        attack_mask |= getQueenAttacks(starting_square, all_pcs);
+        attack_mask |= get_queen_attacks(starting_square, all_pcs);
     }
     // Get king attacks
     piece = pos->pieces[5 + player_offset];

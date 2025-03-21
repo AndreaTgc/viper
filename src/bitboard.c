@@ -1,9 +1,8 @@
 #include "bitboard.h"
 #include "engine_types.h"
-#include "utils.h"
 #include <stdio.h>
 
-void bitboardPrint(Bitboard x) {
+void bitboard_print(Bitboard x) {
     for (int i = 7; i >= 0; i--) {
         for (int j = 0; j < 8; j++) {
             putchar((1ULL << (i * 8 + j)) & x ? 'x' : '.');
@@ -14,30 +13,30 @@ void bitboardPrint(Bitboard x) {
     putchar('\n');
 }
 
-void initSlidingPiecesTables(void) {
+void init_magic_bitboards(void) {
     for (BoardSquare sq = A1; sq <= H8; sq++) {
         int bits = BOARDSQUARE_N - rook_magics[sq].shift;
         for (int i = 0; i < (1 << bits); i++) {
-            Bitboard blk = generateBlocks(i, bits, rook_magics[sq].mask);
+            Bitboard blk = _generate_blocks(i, bits, rook_magics[sq].mask);
             Bitboard hash =
                 ((blk & rook_magics[sq].mask) * rook_magics[sq].magic) >>
                 rook_magics[sq].shift;
             rook_attacks[hash + rook_magics[sq].offset] =
-                generateRookAttack(sq, blk);
+                _generate_rook_attacks(sq, blk);
         }
         bits = BOARDSQUARE_N - bishop_magics[sq].shift;
         for (int i = 0; i < (1 << bits); i++) {
-            Bitboard blk = generateBlocks(i, bits, bishop_magics[sq].mask);
+            Bitboard blk = _generate_blocks(i, bits, bishop_magics[sq].mask);
             Bitboard hash =
                 ((blk & bishop_magics[sq].mask) * bishop_magics[sq].magic) >>
                 bishop_magics[sq].shift;
             bishop_attacks[hash + bishop_magics[sq].offset] =
-                generateBishopAttack(sq, blk);
+                _generate_bishop_attacks(sq, blk);
         }
     }
 }
 
-static inline Bitboard generateBlocks(int idx, int n, Bitboard mask) {
+static inline Bitboard _generate_blocks(int idx, int n, Bitboard mask) {
     Bitboard blk = 0ULL;
     BoardSquare lsb;
     for (int i = 0; i < n; i++) {
@@ -48,7 +47,7 @@ static inline Bitboard generateBlocks(int idx, int n, Bitboard mask) {
     return blk;
 }
 
-static inline Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks) {
+static inline Bitboard _generate_rook_attacks(BoardSquare sq, Bitboard blocks) {
     Bitboard attacks = 0;
     int rank = sq / 8, file = sq % 8;
     for (int r = rank + 1; r < 8; r++) {
@@ -74,7 +73,7 @@ static inline Bitboard generateRookAttack(BoardSquare sq, Bitboard blocks) {
     return attacks;
 }
 
-static inline Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks) {
+static inline Bitboard _generate_bishop_attacks(BoardSquare sq, Bitboard blocks) {
     Bitboard attacks = 0;
     int rank = sq / 8, file = sq % 8;
     for (int r = rank + 1, f = file + 1; r < 8 && f < 8; r++, f++) {
@@ -100,20 +99,20 @@ static inline Bitboard generateBishopAttack(BoardSquare sq, Bitboard blocks) {
     return attacks;
 }
 
-FORCE_INLINE Bitboard getRookAttacks(BoardSquare sq, Bitboard blocks) {
+Bitboard get_rook_attacks(BoardSquare sq, Bitboard blocks) {
     Bitboard hash = blocks & rook_magics[sq].mask;
     hash = (hash * rook_magics[sq].magic) >> rook_magics[sq].shift;
     return rook_attacks[hash + rook_magics[sq].offset];
 }
 
-FORCE_INLINE Bitboard getBishopAttacks(BoardSquare sq, Bitboard blocks) {
+Bitboard get_bishop_attacks(BoardSquare sq, Bitboard blocks) {
     Bitboard hash = blocks & bishop_magics[sq].mask;
     hash = (hash * bishop_magics[sq].magic) >> bishop_magics[sq].shift;
     return bishop_attacks[hash + bishop_magics[sq].offset];
 }
 
-FORCE_INLINE Bitboard getQueenAttacks(BoardSquare sq, Bitboard blocks) {
-    return getBishopAttacks(sq, blocks) | getRookAttacks(sq, blocks);
+Bitboard get_queen_attacks(BoardSquare sq, Bitboard blocks) {
+    return get_bishop_attacks(sq, blocks) | get_rook_attacks(sq, blocks);
 }
 
 Bitboard rook_attacks[102400];
